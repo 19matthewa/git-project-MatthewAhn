@@ -85,9 +85,8 @@ public class initializeRepositoryTester {
         catch (IOException e){
             e.printStackTrace();
         }
-
         try{
-            String testFolderHash = "4bd82b4983fdad505b2f1ef2a310ae64e4dbaa41"; //must be correct for the test to run
+            String testFolderHash = "588406c0d7977486a6a4ba233e8e2dec03900a2d"; //must be correct for the test to run
             String treeContent = Files.readString(Paths.get("git"+File.separator+"objects"+File.separator+testFolderHash));
 
             if (indexContents.contains("tree " + testFolderHash + " " + testFolder)){

@@ -179,31 +179,49 @@ public class git {
                         for (int i = 0; i < listOfFiles.length; i++) {
                             if (listOfFiles[i].isFile()) {
                                 blob(Paths.get(listOfFiles[i].getPath()));
-                                curContent += "blob " + sha1HashCode(Files.readString(Paths.get(listOfFiles[i].getPath()))) + " " + listOfFiles[i].getName() + "\n";
+                                if (curContent.equals("")){
+                                    curContent += "blob " + sha1HashCode(Files.readString(Paths.get(listOfFiles[i].getPath()))) + " " + listOfFiles[i].getName();
+                                }
+                                 else{curContent += "\n"+ "blob " + sha1HashCode(Files.readString(Paths.get(listOfFiles[i].getPath()))) + " " + listOfFiles[i].getName();}
                             }
                             else if (listOfFiles[i].isDirectory()){
                                 String hashCode = sha1HashCode(listAllFiles(Paths.get(listOfFiles[i].getPath()), allFiles, ""));
-                                curContent += "tree " + hashCode + " " + listOfFiles[i].getName() + "\n";
+                                if (curContent.equals("")){
+                                    curContent += "tree " + hashCode + " " + listOfFiles[i].getName();
+                                }
+                                else{
+                                curContent += "\n" +"tree " + hashCode + " " + listOfFiles[i].getName();
+                            }
                                 Files.write(Paths.get("git"+File.separator+"index"), ("tree " + hashCode + " " + listOfFiles[i].getPath() + "\n").getBytes(), StandardOpenOption.APPEND);
                             }
                         }
                     }
                     
                     String curTreeName = sha1HashCode(curContent);
-                    Files.write(Paths.get("git"+File.separator+"objects"+File.separator+curTreeName), curContent.getBytes());
+                    Files.write(Paths.get("git"+File.separator+"objects"+File.separator+curTreeName), curContent.getBytes());//puts cur content into objects (for sub trees of a tree [this has an extra linie])
 
-                    content += "tree " + curTreeName + " " + entry.toFile().getName() + "\n";
-                    Files.write(Paths.get("git"+File.separator+"index"), ("tree " + curTreeName + " " + entry.toFile().getPath() + "\n").getBytes(), StandardOpenOption.APPEND);
+                    if (content.equals("")){
+                        content += "tree " + curTreeName + " " + entry.toFile().getName() ;//adds the tree to contents
+                    }
+                    else{
+                        content += "\n" + "tree " + curTreeName + " " + entry.toFile().getName();//adds the tree to contents
+                    }
+                    Files.write(Paths.get("git"+File.separator+"index"), ("tree " + curTreeName + " " + entry.toFile().getPath() + "\n").getBytes(), StandardOpenOption.APPEND);//puts cur content into index
                     
                     
                 } else {
-                    content += "blob " + sha1HashCode(Files.readString(entry)) + " " + entry.toFile().getName() + "\n";
+                    if (content.equals("")){
+                        content += "blob " + sha1HashCode(Files.readString(entry)) + " " + entry.toFile().getName();//adds the blob to contents
+                    }
+                    else{
+                        content += "\n" + "blob " + sha1HashCode(Files.readString(entry)) + " " + entry.toFile().getName();//adds the blob to contents
+                    }
                     blob(entry);
                 }
                 
             }
 
-            String hashedFinalTreeName = sha1HashCode(content);
+            String hashedFinalTreeName = sha1HashCode(content);//contents is what actually shows up in the files in objecta folder (fro final tree [this has an extra line])
             Files.write(Paths.get("git"+File.separator+"objects"+File.separator+hashedFinalTreeName), content.getBytes());
             // Files.write(Paths.get("git"+File.separator+"index"), ("tree " + hashedFinalTreeName + " " + currentPath.toFile().getName() + "\n").getBytes(), StandardOpenOption.APPEND);
             return content;
