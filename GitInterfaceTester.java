@@ -3,6 +3,8 @@ public class GitInterfaceTester {
         tree treeThing = new tree();
         Commit commitThing = new Commit();
         treeThing.stage("root");
-        commitThing.commitRoot("Matthew", "Hi");
+        commitThing.commitRoot("Matthew", "sos");
+        TreeAndBlob reset = new TreeAndBlob();
+        // reset.resetIndexAndObjects();
     }
 }

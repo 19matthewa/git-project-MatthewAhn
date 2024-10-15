@@ -64,6 +64,14 @@ public class Commit implements GitInterface{
 
         String rootContents = getContents(commmitFile);
         String newRootHashCode = git.sha1HashCode(rootContents);
+    
+        String thePath = "git"+File.separator+"objects"+File.separator+newRootHashCode;
+        try {
+            Files.write(Paths.get(thePath),rootContents.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         updateHead(newRootHashCode);
 
         return newRootHashCode;
