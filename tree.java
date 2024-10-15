@@ -6,9 +6,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.io.FileWriter;
 
-public class tree {
- public static void generateAllTrees(Path path) {
+public class tree extends GitInterfaceTester{
+    public void stage(String filePath){
+        resetIndex();
+        neededHashingFromRoot(Paths.get(filePath));
+    }
+
+ public void generateAllTrees(Path path) {
+    git git = new git();
         try{
             String rootName = git.sha1HashCode(listAllFiles(path, null, ""));
             Files.write(Paths.get("git"+File.separator+"index"), ("tree " + rootName + " " + path.toFile().getPath() + "\n").getBytes(), StandardOpenOption.APPEND);
@@ -20,8 +27,9 @@ public class tree {
         
         
     }
-    public static String neededHashingFromRoot(Path path) {
+    public String neededHashingFromRoot(Path path) {
         String hash = "";
+        git git = new git();
         try{
             String rootName = git.sha1HashCode(listAllFiles(path, null, ""));
             Files.write(Paths.get("git"+File.separator+"index"), ("tree " + rootName + " " + path.toFile().getPath() + "\n").getBytes(), StandardOpenOption.APPEND);
@@ -35,8 +43,9 @@ public class tree {
     }
 
     //https://www.geeksforgeeks.org/list-all-files-from-a-directory-recursively-in-java/
-    private static String listAllFiles(Path currentPath, List<Path> allFiles, String content) throws IOException 
+    private String listAllFiles(Path currentPath, List<Path> allFiles, String content) throws IOException 
     {
+        git git = new git();
         int zip = 0;
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(currentPath)) 
         {
@@ -67,7 +76,7 @@ public class tree {
                     }
                     
                     String curTreeName = git.sha1HashCode(curContent);//NEED TO CHECK IF THIS HASH IS ALREADY IN OBJECTS, does below
-                    if (!commit.inObjects(curTreeName)){
+                    if (!inObjects(curTreeName)){
 
                         Files.write(Paths.get("git"+File.separator+"objects"+File.separator+curTreeName), curContent.getBytes());//puts cur content into objects (for sub trees of a tree [this has an extra linie])
 
@@ -93,11 +102,30 @@ public class tree {
             }
 
             String hashedFinalTreeName = git.sha1HashCode(content);//NEED TO CHECK IS THIS HASH IS ALAREADY IN OBJECTS//contents is what actually shows up in the files in objecta folder (fro final tree [this has an extra line])
-            if (!commit.inObjects(hashedFinalTreeName)){
+            if (!inObjects(hashedFinalTreeName)){
                 Files.write(Paths.get("git"+File.separator+"objects"+File.separator+hashedFinalTreeName), content.getBytes());
                 // Files.write(Paths.get("git"+File.separator+"index"), ("tree " + hashedFinalTreeName + " " + currentPath.toFile().getName() + "\n").getBytes(), StandardOpenOption.APPEND);
             }
             return content;
         }
     }   
+
+    public Boolean inObjects(String hashCode) {
+        return Files.exists(Paths.get("git" + File.separator + "objects" + File.separator + hashCode));
+    }
+
+    private void resetIndex() {
+        File indexFile = new File("git" + File.separator + "index");
+        if (indexFile.exists()) {
+            try {
+                FileWriter writer = new FileWriter(indexFile, false); // Overwrite mode
+                writer.write("");
+                writer.close();
+                System.out.println("Index file reset to empty.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
+

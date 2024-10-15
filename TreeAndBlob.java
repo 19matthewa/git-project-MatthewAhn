@@ -13,7 +13,8 @@ import java.util.stream.Stream;
 
 public class TreeAndBlob {
 
-    static void traverse(String nextExpected, String indexContents, String testFolder){
+     void traverse(String nextExpected, String indexContents, String testFolder){
+        git test = new git();
         try{
             String treeContent = Files.readString(Paths.get("git"+File.separator+"objects"+File.separator+nextExpected));//lines are from here (is this right??)
             
@@ -34,7 +35,7 @@ public class TreeAndBlob {
                 else{
                     String[] linePath = lineContent[2].split("/");
                     Path pathToActualFile = findByFileName(Paths.get(testFolder), linePath[linePath.length-1]).get(0);
-                    String correctHash = git.sha1HashCode(Files.readString(pathToActualFile)); //rely on Hash Function to work
+                    String correctHash = test.sha1HashCode(Files.readString(pathToActualFile)); //rely on Hash Function to work
                     if ((lineContent[1]).equals(correctHash)){
                         System.out.print("Correct Hash for the following: ");
                     }
@@ -51,7 +52,7 @@ public class TreeAndBlob {
 
     }
 
-    public static List<Path> findByFileName(Path path, String fileName)
+    public List<Path> findByFileName(Path path, String fileName)
             throws IOException {
 
         List<Path> result;
@@ -65,12 +66,14 @@ public class TreeAndBlob {
     public static void main(String[] args) {
 
         git test = new git();
+        TreeAndBlob tester = new TreeAndBlob();
+        tree tree = new tree();
 
         String testFolder = "root";
 
         test.initializeRepository();
 
-        resetIndexAndObjects();
+        tester.resetIndexAndObjects();
 
         tree.generateAllTrees(Paths.get(testFolder));
 
@@ -104,12 +107,12 @@ public class TreeAndBlob {
                 }
                 System.out.println(lineContent[2]);
                 if (lineContent[0].equals("tree")){
-                    traverse(lineContent[1], indexContents, testFolder);//traverses if tree
+                    tester.traverse(lineContent[1], indexContents, testFolder);//traverses if tree
                 }
                 else{
                     String[] linePath = lineContent[2].split("/");
-                    Path pathToActualFile = findByFileName(Paths.get(testFolder), linePath[linePath.length-1]).get(0);
-                    String correctHash = git.sha1HashCode(Files.readString(pathToActualFile)); //rely on Hash Function to work
+                    Path pathToActualFile = tester.findByFileName(Paths.get(testFolder), linePath[linePath.length-1]).get(0);
+                    String correctHash = test.sha1HashCode(Files.readString(pathToActualFile)); //rely on Hash Function to work
                     if ((lineContent[1]).equals(correctHash)){
                         System.out.print("Correct Hash for the following: ");
                     }
@@ -126,7 +129,7 @@ public class TreeAndBlob {
             e.printStackTrace();
         }
 
-        resetIndexAndObjects();
+        tester.resetIndexAndObjects();
 
         //Old Tester Below
 
@@ -163,7 +166,7 @@ public class TreeAndBlob {
         // }
     }
 
-    public static void resetIndexAndObjects() {
+    public void resetIndexAndObjects() {
         File indexFile = new File("git" + File.separator + "index");
         if (indexFile.exists()) {
             try {

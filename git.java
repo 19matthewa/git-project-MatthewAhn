@@ -81,7 +81,7 @@ public class git {
         }
     }
 
-    public static void blob(Path path, int zip) {
+    public void blob(Path path, int zip) {
         // get file conents and sha1 hash
 
         StringBuffer contents = new StringBuffer();
@@ -136,7 +136,7 @@ public class git {
 
             hashCode = sha1HashCode(contents.toString());// NEED TO CHECK IF HASH ALREADY EXISTS, does so below
 
-            if (!commit.inObjects(hashCode)) {
+            if (!inObjects(hashCode)) {
 
                 BufferedWriter bufferedWriter = new BufferedWriter(
                         new FileWriter(objectsPath + File.separator + hashCode));
@@ -154,6 +154,9 @@ public class git {
             System.out.println(e + "sss");
         }
 
+    }
+    public Boolean inObjects(String hashCode) {
+        return Files.exists(Paths.get("git" + File.separator + "objects" + File.separator + hashCode));
     }
 
     // public void generateAllTrees(Path path) {
@@ -252,7 +255,7 @@ public class git {
     // }
 
     // generates sha1 hashcode badsed on contents
-    public static String sha1HashCode(String contents) {
+    public String sha1HashCode(String contents) {
         String result = "";
         try {
             MessageDigest message = MessageDigest.getInstance("SHA-1");

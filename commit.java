@@ -8,11 +8,24 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 
-public class commit {
-    public static String commitRoot(String author, String note) {
-        resetIndex();
-        String root = "root";
-        String treeHash = tree.neededHashingFromRoot(Paths.get(root));
+public class Commit implements GitInterface{
+    public void stage(String filePath){
+        System.out.println("stage is in tree.java");
+    }
+
+    public String commit(String author, String message){
+        return commitRoot(author,message);
+    }
+
+    public void checkout(String commitHash){
+    }
+
+    public String commitRoot(String author, String note) {
+        //resetIndex();
+        git git = new git();
+        tree tree = new tree();
+
+        String treeHash = tree.neededHashingFromRoot(Paths.get("root"));
 
         String parent = "";
         File showParent = new File("git" + File.separator + "HEAD");
@@ -43,7 +56,7 @@ public class commit {
             writer.write("parent: " + parent + "\n");
             writer.write("author: " + author + "\n");
             writer.write("date: " + date + "\n");
-            writer.write("method: " + note);
+            writer.write("message: " + note);
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -56,26 +69,20 @@ public class commit {
         return newRootHashCode;
     }
 
-    public static void checkout(String commitHash){
-        //update working directory to commit state
-    }
 
-    public static Boolean inObjects(String hashCode) {
-        return Files.exists(Paths.get("git" + File.separator + "objects" + File.separator + hashCode));
-    }
-
-    public static void updateHead(String newRootHashCode) {
+    public void updateHead(String newRootHashCode) {
         File head = new File("git" + File.separator + "HEAD");
         FileWriter writer;
         try {
             writer = new FileWriter(head, false);
             writer.write(newRootHashCode);
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void resetIndex() {
+    private void resetIndex() {
         File indexFile = new File("git" + File.separator + "index");
         if (indexFile.exists()) {
             try {
@@ -89,7 +96,7 @@ public class commit {
         }
     }
 
-    public static String getContents(File commmitFile) {
+    public String getContents(File commmitFile) {
         StringBuffer contents = new StringBuffer();
         try {
             FileReader contentReader = new FileReader(commmitFile);

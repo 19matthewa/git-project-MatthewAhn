@@ -1,7 +1,13 @@
 public interface GitInterface {
+
     /**
-     * clears the index
-     * stages the file
+     * Stages a file for the next commit.
+     *
+     * @param filePath The path to the file to be staged.
+     */
+    void stage(String filePath);
+
+    /**
      * Creates a commit with the given author and message.
      * It should capture the current state of the repository,
      * update the HEAD, and return the commit hash.
